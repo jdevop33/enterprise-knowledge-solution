@@ -88,6 +88,12 @@ class DbConfigJobRunner:
                 """
 
             db_conn.execute(sql_commands)
+            db_conn.close()
+            db_conn.dispose()
+
+        def __del__(self):
+            if self.connector:
+                self.connector.close()  # Close the connector when the object is garbage collected
 
 
 def run() -> None:
