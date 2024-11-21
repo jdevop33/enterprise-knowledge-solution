@@ -76,13 +76,18 @@ class DbConfigJobRunner:
         """
         users = [os.environ["ALLOYDB_USER_SPECIALIZED_PARSER"], "postgres"]
         with self.alloydb_connection_pool.connect() as db_conn:
-            db_conn.execute("CREATE SCHEMA IF NOT EXISTS eks")
+            sql_commands = """
+            CREATE SCHEMA IF NOT EXISTS eks;
+            """
+
             for user in users:
-                db_conn.execute(f'GRANT ALL ON SCHEMA eks TO "{user}"')
-                db_conn.execute(
-                    f'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA eks TO "{user}"'
-                )
-                db_conn.execute(f'GRANT USAGE ON SCHEMA eks TO "{user}"')
+                sql_commands += f"""
+                GRANT ALL ON SCHEMA eks TO "{user}";
+                GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA eks TO "{user}";
+                GRANT USAGE ON SCHEMA eks TO "{user}";
+                """
+
+            db_conn.execute(sql_commands)
 
 
 def run() -> None:
